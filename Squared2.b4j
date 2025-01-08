@@ -1,0 +1,145 @@
+﻿AppType=JavaFX
+Build1=Default,b4j.example
+File1=android-chrome-192x192.png
+File10=theme.css
+File2=android-chrome-512x512.png
+File3=favicon.ico
+File4=favicon-16x16.png
+File5=favicon-32x32.png
+File6=maskable_icon.png
+File7=mstile-150x150.png
+File8=safari.png
+File9=safari-pinned-tab.svg
+FileGroup1=Default Group
+FileGroup10=Default Group
+FileGroup2=Default Group
+FileGroup3=Default Group
+FileGroup4=Default Group
+FileGroup5=Default Group
+FileGroup6=Default Group
+FileGroup7=Default Group
+FileGroup8=Default Group
+FileGroup9=Default Group
+Group=Default Group
+Library1=banano
+Library2=jcore
+Library3=jfx
+Module1=pageHome
+Module2=SDtensorflowSquared
+NumberOfFiles=10
+NumberOfLibraries=3
+NumberOfModules=2
+Version=10
+@EndOfDesignText@
+#Region Project Attributes 
+	#MainFormWidth: 600
+	#MainFormHeight: 600 
+	#IgnoreWarnings: 16, 10, 14, 15		
+#End Region
+
+#JavaCompilerPath: 19, C:\Program Files\Java\jdk-19.0.2\bin\javac.exe
+
+Sub Process_Globals
+	Private fx As JFX
+	Public AppName As String = "squared2"
+	Public AppTitle As String = "Squared2"
+	Private Publish As String = "C:\laragon\www"
+	Public Version As String = "1.00"
+	Public ServerIP As String = "http://localhost/"
+	
+	Private BANano As BANano 'ignore
+	Private HomePage As pageHome
+End Sub
+
+Sub AppStart (Form1 As Form, Args() As String)
+	' With this little snippet, the new B4J 9.30 logs with jump are activated
+	#if Debug
+		' MUST be literally this line if you want to use the B4J Logs jump to code feature!
+		Log("BANanoLOGS")
+	#End if
+		
+	' some general settings like the name of your PWA
+	BANano.Initialize("BANano", AppName,DateTime.Now)
+	BANano.Header.Title=AppTitle
+	' DateTime.Now is to make sure our app is reloaded on ReBuild
+	BANano.JAVASCRIPT_NAME = "app" & DateTime.Now & ".js"
+	
+	BANano.Header.Author ="Star-Dust"
+	'BANano.Header.Charset = "iso-8859-1"
+	BANano.Header.Description = "Car Up Keep"
+	'BANano.header.Expires = "Mon, 22 Jul 2002 11:12:01 GMT"
+	BANano.Header.Keywords = "Software,mobile,desktop,ios,android"
+	BANano.Header.Language = "it"
+	BANano.Header.AddMeta($"<meta name="copyright" content="&copy; 2020 BVAD3">"$)
+	BANano.Header.AddMeta($"<meta name="robots" content="ALL">"$)
+	
+	'---------------------IMPORTANT ----------------------------------------------------
+	BANano.Header.AddJavascriptFile("https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js")
+
+	' some directives for the Tranpiler
+	BANano.TranspilerOptions.MergeAllCSSFiles = True
+	BANano.TranspilerOptions.MergeAllJavascriptFiles = True
+	BANano.TranspilerOptions.RemoveDeadCode = True
+	BANano.TranspilerOptions.ShowWarningDeadCode = True
+	BANano.TranspilerOptions.EnableLiveCodeSwapping = True
+	
+	' this line makes sure our Web App becomes a PWA
+	#if Release
+	BANano.TranspilerOptions.UseServiceWorkerWithUpdateMessage(True, "#26AE60", "Update available", "Click here to update the app to the latest version")
+	#end if	
+	
+	' optional: if your WebApp is not in the root
+	' BANano.TranspilerOptions.SetPWAStartUrl("myPWA/index.html")
+	BANano.Header.BackgroundColor = "#1e1e1e"
+
+	' additonal JavaScript and CSS files we want to include
+	' BANano.Header.AddJavascriptFile("jsstore.min.js")
+
+	' settings needed for the PWA app icons, splash screens, etc…
+	BANano.Header.AddMSTileIcon("mstile-150x150.png", "150x150")
+	BANano.Header.MSTileColor = "#ffc40d"
+	
+	BANano.Header.AddManifestIcon("android-chrome-192x192.png", "192x192")
+	BANano.Header.AddManifestIcon("android-chrome-512x512.png", "512x512")
+	BANano.Header.SetAndroidMaskIcon("maskable_icon.png", "731x731")
+	BANano.Header.MaskIconColor = "#1e1e1e"
+		
+	BANano.Header.AddFavicon("favicon-16x16.png", "16x16")
+	BANano.Header.AddFavicon("favicon-32x32.png", "32x32")
+	
+	' php
+	BANano.PHP_NAME = $"${AppName}.php"$
+	BANano.PHPHost = $"${ServerIP}/"$
+	BANano.PHPAddHeader("Access-Control-Allow-Origin: *")
+		
+	' start the actual build
+	BANano.Build(Publish)
+	
+	#if Release
+		fx.ShowExternalDocument($"${ServerIP}/index.html"$)
+	'BANano.BuildAsB4Xlib(Version)
+	#Else
+		fx.ShowExternalDocument($"${ServerIP}/${AppName}/index.html"$)
+	#End if
+	Log("Completed " & DateTime.Time(DateTime.now))
+	ExitApplication
+End Sub
+
+'Return true to allow the default exceptions handler to handle the uncaught exception.
+Sub Application_Error (Error As Exception, StackTrace As String) As Boolean
+	Return True
+End Sub
+
+' HERE STARTS YOUR APP
+Sub BANano_Ready()
+	' get the body tag
+	Private body As BANanoElement
+	body.Initialize("#body")
+	
+	body.SetStyle($"{ "width": "100%","justify-content": "space-between", "text-align": "center"} "$)
+	body.Append($"<div id="mainHolder"></div>"$).Get("#mainHolder")
+			
+	HomePage.Initialize(BANano)
+	
+	HomePage.Show
+End Sub
